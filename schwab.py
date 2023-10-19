@@ -4,6 +4,10 @@ import util.db as db
 # read in data
 df = pd.read_csv('schwab.csv', na_filter=False)
 
+# strip whitespace
+for col in df.columns:
+    df[col] = df[col].str.strip(to_strip=None)
+    df[col] = df[col].str.replace('  ', '')
 
 # #####################################################################
 # # FORMAT COLUMNS
@@ -34,4 +38,7 @@ df['call_or_put'] = details[3]
 # Concat from sym, exp_date, strike_Price, call_or_put
 df['Symbol'] = df['sym'] + df['call_or_put'] + df['exp_date'].dt.strftime('%y%m%d') + df['strike_price'].astype(str)
 
-
+# Column Name (source):     n/a
+# Column Name (database):   broker
+# Null:                     not null
+df['Institution'] = 'Schwab'
