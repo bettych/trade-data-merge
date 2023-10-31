@@ -4,11 +4,6 @@ import util.db as db
 # read in data
 df = pd.read_csv('schwab.csv', na_filter=False)
 
-# strip whitespace
-for col in df.columns:
-    df[col] = df[col].str.strip(to_strip=None)
-    df[col] = df[col].str.replace('  ', '')
-
 # #####################################################################
 # # FORMAT COLUMNS
 # #####################################################################
@@ -42,3 +37,17 @@ df['Symbol'] = df['sym'] + df['call_or_put'] + df['exp_date'].dt.strftime('%y%m%
 # Column Name (database):   broker
 # Null:                     not null
 df['Institution'] = 'Schwab'
+
+# Column Name (source):     Price, Fees & Comm, Amount
+# Column Name (database):   price, commission, regulatory_fee, amount
+# Null:                     null
+# Remove dollar sign ($), comma (,), parenthesis, and whitespace
+regex_symbol = '(\$|\,|\(|\)|\s)'
+df['Price'] = df['Price'].str.replace(regex_symbol, '', regex=True)
+df['Price'] = pd.to_numeric(df['Price'])
+
+df['Fees & Comm'] = df['Fees & Comm'].str.replace(regex_symbol, '', regex=True)
+df['Fees & Comm'] = pd.to_numeric(df['Fees & Comm'])
+
+df['Amount'] = df['Amount'].str.replace(regex_symbol, '', regex=True)
+df['Amount'] = pd.to_numeric(df['Amount'])
